@@ -1,30 +1,31 @@
 FROM ubuntu:22.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
-    sudo \
     gnupg \
-    apt-transport-https \
     ca-certificates \
-    software-properties-common \
-    fuse \
-    libfuse2 \
-    unzip \ 
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
+# Install rclone
 RUN curl https://rclone.org/install.sh | bash
 
-RUN curl https://downloads.plex.tv/plex-keys/PlexSign.key | apt-key add - && \
-    echo "deb https://downloads.plex.tv/repo/deb public main" > /etc/apt/sources.list.d/plexmediaserver.list && \
+# Install Plex
+RUN curl https://downloads.plex.tv/plex-keys/PlexSign.key | gpg --dearmor -o /usr/share/keyrings/plex.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/plex.gpg] https://downloads.plex.tv/repo/deb public main" \
+    > /etc/apt/sources.list.d/plexmediaserver.list && \
     apt-get update && apt-get install -y plexmediaserver
 
-RUN mkdir /mnt/onedrive
-RUN groupadd fuse || true
-RUN usermod -aG fuse root
-
+# Plex default port
 EXPOSE 32400
 
+# rclone serve port
+EXPOSE 8080
+
+# Copy start script
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
