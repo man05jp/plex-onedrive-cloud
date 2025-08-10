@@ -1,0 +1,24 @@
+name: Deploy Plex with Rclone
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up rclone config
+      run: |
+        mkdir -p ~/.config/rclone
+        echo "${{ secrets.RCLONE_CONFIG }}" > ~/.config/rclone/rclone.conf
+
+    - name: Build and deploy Docker container
+      run: |
+        docker build -t plex-onedrive .
+        # Replace below with your deploy command (e.g. push to registry, deploy to Koyeb, etc)
+        docker run -d -p 32400:32400 plex-onedrive
