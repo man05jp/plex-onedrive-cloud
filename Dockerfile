@@ -20,6 +20,7 @@ RUN curl https://downloads.plex.tv/plex-keys/PlexSign.key | apt-key add - && \
     apt-get update && apt-get install -y plexmediaserver
 
 RUN mkdir /mnt/onedrive
+RUN groupadd fuse || true
 RUN usermod -aG fuse root
 
 EXPOSE 32400
